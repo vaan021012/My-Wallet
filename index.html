@@ -14,6 +14,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     .grid {
@@ -138,11 +139,19 @@
       document.querySelector('.main').classList.toggle('expanded');
     }
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById("userEmail").innerText = "👤 " + user.email;
-      }
+    firebase.auth().onAuthStateChanged(async (user) => {
+  if (user) {
+    const db = firebase.firestore();
+
+    const querySnapshot = await db.collection("users")
+      .where("email", "==", user.email)
+      .get();
+
+    querySnapshot.forEach((doc) => {
+      document.getElementById("userEmail").innerText = "👤 " + doc.data().name;
     });
+  }
+});
 
     // ===== LOAD =====
     async function loadStatic() {
